@@ -1,0 +1,28 @@
+# Python virtual environments
+venv/
+myenv/
+.env
+
+# Streamlit cache and logs
+.streamlit/
+*.log
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Test and coverage outputs
+htmlcov/
+.coverage
+.cache/
