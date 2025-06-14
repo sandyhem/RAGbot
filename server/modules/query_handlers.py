@@ -1,16 +1,19 @@
 from logger import logger
 
-def query_chain(chain,user_input:str):
+def query_chain(chain, user_input: str, role: str = None):
     try:
-        logger.debug(f"Running chain for input: {user_input}")
-        prompt = f"""You are a helpful assistant. Answer the following question using the provided documents.
+        logger.debug(f"Running chain for input: {user_input} (role: {role})")
+        prompt = f"""You are a helpful assistant."""
+        if role:
+            prompt += f" You are acting as a {role}."
+        prompt += f""" Answer the following question using the provided documents.
 Question: {user_input}
 If you use any sources, list them at the end."""
 
         result = chain({"query": prompt})
         response = {
-            "response" : result["result"],
-            "sources":[doc.metadata.get("source","") for doc in result["source_documents"]]
+            "response": result["result"],
+            "sources": [doc.metadata.get("source", "") for doc in result["source_documents"]]
         }
         logger.debug(f"Chain response: {response}")
         return response

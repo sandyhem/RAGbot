@@ -4,12 +4,22 @@ from langchain.vectorstores import Chroma
 from langchain.embeddings import HuggingFaceBgeEmbeddings
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import shutil
+
+# PERSIST_DIR: Directory where the Chroma vectorstore is saved (./chroma_db).
+# UPLOAD_DIR: Directory where uploaded PDFs are stored (./uploaded_pdfs).
 
 PERSIST_DIR= "./chroma_db"
 UPLOAD_DIR = "./uploaded_pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
+# Purpose: Handles uploaded PDF files, 
+# extracts their content, splits them into chunks, generates embeddings, 
+# and stores them in a persistent Chroma vectorstore.
+
 def load_vectorstore(files):
+    clear_data() 
     file_paths=[]
    
     for file in files:
@@ -28,8 +38,10 @@ def load_vectorstore(files):
              chunk_size=1000,
              chunk_overlap=100)
     texts = text_splitter.split_documents(docs)
+    
     embeddings = HuggingFaceBgeEmbeddings(model_name="all-MiniLM-L12-v2")
 
+    # storing the embeddings in a persistent vectorstore
     if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
            vectorstore = Chroma(
                persist_directory=PERSIST_DIR,
@@ -51,3 +63,12 @@ def get_vectorstore(persist_directory, embedding_function):
         persist_directory=persist_directory,
         embedding_function=embedding_function
     )
+
+def clear_data():
+    import shutil
+    # Remove uploaded PDFs
+    shutil.rmtree(UPLOAD_DIR, ignore_errors=True)
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    # Remove vectorstore
+    shutil.rmtree(PERSIST_DIR, ignore_errors=True)
+    os.makedirs(PERSIST_DIR, exist_ok=True)

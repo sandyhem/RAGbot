@@ -4,6 +4,9 @@ from utils.api import ask_question_api
 def render_chat():
     st.subheader("💬 Chat with your documents")
 
+    # Add role selector
+    role = st.selectbox("Select your role:", ["Python Developer", "Java Developer"])
+
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
@@ -17,7 +20,8 @@ def render_chat():
         st.chat_message("user").markdown(user_input)
         st.session_state.messages.append({"role": "user", "content": user_input})
 
-        response = ask_question_api(user_input)
+        # Pass role to API
+        response = ask_question_api(user_input, role)
         if response.status_code == 200:
             data = response.json()
             answer = data["response"]

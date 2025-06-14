@@ -48,9 +48,12 @@ async def upload_pdfs(files: List[UploadFile] = File(...)):
         )
     
 @app.post("/ask/")
-async def ask_questtion(question: str = Form(...)):
+async def ask_question(
+    question: str = Form(...),
+    role: str = Form(None)  # Add role as optional
+):
     try:
-        logger.info(f"User question: {question}")
+        logger.info(f"User question: {question}, Role: {role}")
         from langchain.embeddings import HuggingFaceBgeEmbeddings
         from modules.load_vectorstore import PERSIST_DIR
 
@@ -59,7 +62,8 @@ async def ask_questtion(question: str = Form(...)):
             embedding_function=HuggingFaceBgeEmbeddings(model_name="all-MiniLM-L12-v2")
         )
         chain = get_llm_chain(vectorstore)
-        result = query_chain(chain, question)
+        # Pass role to query_chain
+        result = query_chain(chain, question, role=role)
         logger.info("Response generated successfully")
         return result
 
@@ -73,3 +77,10 @@ async def ask_questtion(question: str = Form(...)):
 @app.get("/test")
 async def test():
     return {"message": "Hello, World!"}
+
+@app.post("/clear_knowledge/")
+async def clear_knowledge():
+    from modules.load_vectorstore import clear_data
+    clear_data()
+    return {"message": "Knowledge base cleared."}
+
